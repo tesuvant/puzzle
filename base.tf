@@ -16,19 +16,19 @@ resource "azurerm_resource_group" "vmgroup" {
     tags     = var.tags
 }
 
-# resource "azurerm_storage_account" "sa" {
-#     name =  "puzzlesa"
-#     resource_group_name = azurerm_resource_group.vmgroup.name
-#     location = var.location
-#     account_kind = "StorageV2"
-#     account_tier = "Standard"
-#     account_replication_type = "LRS"
-#     enable_https_traffic_only = true
-#     large_file_share_enabled  = false
+resource "azurerm_storage_account" "sa" {
+    name =  "puzzlesa"
+    resource_group_name = azurerm_resource_group.vmgroup.name
+    location = var.location
+    account_kind = "StorageV2"
+    account_tier = "Standard"
+    account_replication_type = "LRS"
+    enable_https_traffic_only = true
+    large_file_share_enabled  = false
 
-#     tags = var.tags
-#     depends_on = [azurerm_resource_group.vmgroup]
-# }
+    tags = var.tags
+    depends_on = [azurerm_resource_group.vmgroup]
+}
 
 # Create vnet + subnets
 module "network" {
@@ -61,7 +61,7 @@ module "linuxservers" {
   remote_port                      = "22"
   enable_ssh_key                   = true
   vnet_subnet_id                   = module.network.vnet_subnets[count.index]
-  ssh_key_values                   = [file("~/.ssh/id_rsa.pub")]
+  ssh_key_values                   = ["ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCWNQkDtUSJXJzbOBaWK+tLmmXfYVBLnD9nYmHTDabI4JJ354Hy+256fAQXpjSG2CqoLGEEoRqUoKAUu+16W9uV6Je6wi9RKEG2FnV39EhdFaknHVLdSkkdwJTjvnindGk3pvtGQzKXT+cd9e2CI5gwO45YYSIudyYWMEXMRNOg0yC4ixYTdnDBJV/Py1+aEQZXBcHca81zUpzW2yGIyUUZZuDNOwnmC+n3axenkbKh/o6IiWAR8krVWmSjUh7NZyWklFlD8vPr5y/oohCBn5kM0SWYMkGyNe91QLjEwsjveJ+1fJLss5/wlmwoyPb3r1jgjXRYEfxNRxdvp1VfwdJ4Ck2hWhkMaI/+5QPmTnEEcbwyPihF0DWLFdk4MW/6M4a2gCnaR3ljFO9jJeyJBClywY2Tg2u8ap4KY0wo6AEBlW64e+nn1gZsCfx6SAG0zrZnMewjk1ttKA6SfEAiXWdGnPsaVIxfUGGh2ujv59fB3Uo5Bdj6av1RWpME1d1+u4PIeShpwlKVhWKqKB1Z76VLSFyWSYlMdu7ScPl6Ef9xqpNUBQqCpQjKB9fSM/NQBhJYqzYNfcnNoBAV1flt72AqDDb65ui/T8rdFyZgAkkJCMseyPAHWjB1kJ15d0ctv29QhaGKg+c6ZkjOqVcP1p0dWvN5Siwzj+e4vDsU3dUCYQ=="]
   delete_data_disks_on_termination = true
 
   custom_data = base64encode(data.local_file.cloudinit.content)
@@ -73,17 +73,17 @@ data "local_file" "cloudinit" {
     filename = "${path.module}/cloud-init.conf"
 }
 
-resource "azurerm_dev_test_global_vm_shutdown_schedule" "shutdown" {
-  virtual_machine_id    = module.linuxservers[0].azurerm_virtual_machine.vm-linux.*.id
-  location              = var.location
-  enabled               = true
-  daily_recurrence_time = "0000"
-  timezone              = "W. Europe Standard Time"
+# resource "azurerm_dev_test_global_vm_shutdown_schedule" "shutdown" {
+#   virtual_machine_id    = 
+#   location              = var.location
+#   enabled               = true
+#   daily_recurrence_time = "0000"
+#   timezone              = "W. Europe Standard Time"
 
-  notification_settings {
-    enabled         = true
-    time_in_minutes = "60"
-    email           = "joe@average.com"
-    webhook_url     = "https://sample-webhook-url.example.com"
-  }
-}
+#   notification_settings {
+#     enabled         = true
+#     time_in_minutes = "60"
+#     email           = "joe@average.com"
+#     webhook_url     = "https://sample-webhook-url.example.com"
+#   }
+# }
